@@ -32,7 +32,10 @@ from absl import app
 from absl import flags
 from absl import logging
 
+from easse.report import get_all_scores
+
 import score_lib
+from utils import read_lines, get_data_filepath
 
 FLAGS = flags.FLAGS
 
@@ -50,18 +53,17 @@ def main(argv):
     raise app.UsageError('Too many command-line arguments.')
   flags.mark_flag_as_required('prediction_file')
 
-  sources, predictions, target_lists = score_lib.read_data(
+  sources, predictions, _ = score_lib.read_data(
       FLAGS.prediction_file, FLAGS.case_insensitive)
+  ref_filepaths = [get_data_filepath('turkcorpus', 'valid', 'simple.turk', i) for i in range(8)]
+  target_lists = [read_lines(ref_filepath) for ref_filepath in ref_filepaths]
   logging.info(f'Read file: {FLAGS.prediction_file}')
-  exact = score_lib.compute_exact_score(predictions, target_lists)
-  sari, keep, addition, deletion = score_lib.compute_sari_scores(
-      sources, predictions, target_lists)
-  print(f'Exact score:     {100*exact:.3f}')
-  print(f'SARI score:      {100*sari:.3f}')
-  print(f' KEEP score:     {100*keep:.3f}')
-  print(f' ADDITION score: {100*addition:.3f}')
-  print(f' DELETION score: {100*deletion:.3f}')
-
+  turk_scores = get_all_scores(orig_sents=sources, sys_sents=predictions, refs_sents=target_lists)
+  logging.info("[turk] {}".format(turk_scores))
+  ref_filepaths = [get_data_filepath('asset', 'valid', 'simp', i) for i in range(10)]
+  target_lists = [read_lines(ref_filepath) for ref_filepath in ref_filepaths]
+  asset_scores = get_all_scores(orig_sents=sources, sys_sents=predictions, refs_sents=target_lists)
+  logging.info("[asset] {}".format(asset_scores))
 
 if __name__ == '__main__':
   app.run(main)

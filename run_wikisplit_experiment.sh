@@ -18,12 +18,12 @@
 
 # Download the WikiSplit data from:
 # https://github.com/google-research-datasets/wiki-split
-WIKISPLIT_DIR=/path/to/wiki-split
+WIKISPLIT_DIR=./wiki-split
 # Preprocessed data and models will be stored here.
-OUTPUT_DIR=/path/to/output
+OUTPUT_DIR=./output
 # Download the pretrained BERT model:
 # https://storage.googleapis.com/bert_models/2018_10_18/cased_L-12_H-768_A-12.zip
-BERT_BASE_DIR=/path/to/cased_L-12_H-768_A-12
+BERT_BASE_DIR=./cased_L-12_H-768_A-12
 
 ### Optional parameters ###
 

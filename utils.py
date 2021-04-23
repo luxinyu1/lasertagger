@@ -26,6 +26,7 @@ from typing import Iterator, Mapping, Sequence, Text, Tuple
 
 import tensorflow as tf
 
+from pathlib import Path
 
 def get_token_list(text):
   """Returns a list of tokens.
@@ -114,3 +115,33 @@ def read_label_map(path):
             )
           empty_line_encountered = True
       return label_map
+
+def count_lines(filepath):
+  n_lines = 0
+  with Path(filepath).open() as f:
+      for l in f:
+          n_lines += 1
+  return n_lines
+
+def yield_lines(filepath, n_lines=float('inf'), prop=1):
+  if prop < 1:
+      assert n_lines == float('inf')
+      n_lines = int(prop * count_lines(filepath))
+  with open(filepath, 'r') as f:
+      for i, l in enumerate(f):
+          if i >= n_lines:
+              break
+          yield l.rstrip('\n')
+
+def read_lines(filepath, n_lines=float('inf'), prop=1):
+  return list(yield_lines(filepath, n_lines, prop))
+
+def get_dataset_dir(dataset):
+  return Path(__file__).resolve().parent / 'datasets' / dataset
+
+def get_data_filepath(dataset, phase, language, i=None):
+  suffix = ''
+  if i is not None:
+      suffix = f'.{i}'
+  filename = f'{dataset}.{phase}.{language}{suffix}'
+  return get_dataset_dir(dataset) / filename
